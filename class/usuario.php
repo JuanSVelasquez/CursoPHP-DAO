@@ -99,6 +99,17 @@ class Usuario{
         $stmt->execute();
     }
 
+    public function delete(){
+        $sql= new Sql;
+        $sql->exequery("DELETE FROM usuarios WHERE idusuario = :ID",array(
+            ":ID"=>$this->getIdusuario()
+        ));
+        $this->setIdusuario(0);
+        $this->setDeslogin("");
+        $this->setDessenha("");
+        $this->setDtcadastro(new DateTime());  
+    }
+
     public function __toString(){
         return json_encode(array(
             "idusuario"=>$this->getIdusuario(),

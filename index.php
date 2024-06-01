@@ -25,8 +25,15 @@ require_once("config.php");
 //$var_dum($aluno);
 
 //editar um usuario e senha
-$usuario=new Usuario;
-$usuario->loadById(4);
-$usuario->update('alberto','12g3gj1h2');
+//$usuario=new Usuario;
+//$usuario->loadById(4);
+//$usuario->update('alberto','12g3gj1h2');
+//echo $usuario;
+
+//deletar usuario
+$usuario = new Usuario;
+$usuario->loadById(2);
+$usuario->delete();
 echo $usuario;
+
 ?>
