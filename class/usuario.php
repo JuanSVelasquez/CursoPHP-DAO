@@ -33,19 +33,29 @@ class Usuario{
     public function setDtcadastro($value){
         $this->dtcadastro=$value;
     }
-    
+
     public function loadById($id){
         $sql = new Sql;
         $result=$sql->select("SELECT * FROM usuarios WHERE idusuario = :ID", array(
             ":ID"=>$id
         ));
-        if (count($result) > 0){
-            $row=$result[0];
-            $this->setIdusuario($row['idusuario']);
-            $this->setDessenha($row['dessenha']);
-            $this->setDeslogin($row['deslogin']);
-            $this->setDtcadastro(new DateTime($row['dtcadastro']));
+        if (count($result) > 0) {
+            $this->setData($result[0]);
+        } else {
+            throw new Exception("Login e/ou senha inválidos.");
         }
+    }
+
+    public function update($login,$password){
+        $this->setDeslogin($login);
+        $this->setDessenha($password);
+
+        $sql= new Sql;
+        $sql->exequery("UPDATE usuarios SET deslogin = :LOGIN, dessenha = :PASSWORD WHERE idusuario = :ID", array (
+            ':LOGIN'=>$this->getDeslogin(),
+            ':PASSWORD'=>$this->getDessenha(),
+            ':ID'=>$this->getIdusuario()
+        ));
     }
     
     public static function getList(){
@@ -67,17 +77,27 @@ class Usuario{
             ":LOGIN"=>$login,
             ":PASSWORD"=>$password
         ));
-        if (count($result) > 0){
-            $row=$result[0];
-            $this->setIdusuario($row['idusuario']);
-            $this->setDessenha($row['dessenha']);
-            $this->setDeslogin($row['deslogin']);
-            $this->setDtcadastro(new DateTime($row['dtcadastro']));
-        }else{
+        if (count($result) > 0) {
+            $this->setData($result[0]);
+        } else {
             throw new Exception("Login e/ou senha inválidos.");
         }
     }
 
+    public function setData($data){
+        $this->setIdusuario($data['idusuario']);
+        $this->setDeslogin($data['deslogin']);
+        $this->setDessenha($data['dessenha']);
+        $this->setDtcadastro(new DateTime($data['dtcadastro']));        
+    }
+
+    public function insert($login,$password){
+        $conn=new PDO("sqlsrv:Database=php;server=localhost\SQLSERVER;ConnectionPooling=0","sa","0000");
+        $stmt=$conn->prepare("INSERT INTO usuarios (deslogin,dessenha) VALUES (:LOGIN,:PASSWORD)");
+        $stmt->bindParam(":LOGIN",$login);
+        $stmt->bindParam(":PASSWORD",$password);
+        $stmt->execute();
+    }
 
     public function __toString(){
         return json_encode(array(
@@ -87,5 +107,5 @@ class Usuario{
             "dtcadastro"=>$this->getDtcadastro()->format("d/m/Y H:i:s")
         ));
     }
-}
+}   
 ?>
